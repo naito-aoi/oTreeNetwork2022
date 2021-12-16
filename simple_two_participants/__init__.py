@@ -85,7 +85,7 @@ class Task(Page):
             # タイムアウト: -1 を返す
             player.choice = -1
 
-    #timeout_seconds = 12
+    timeout_seconds = 12
     timer_text = '残り時間：'
 
     form_model = 'player'
