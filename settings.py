@@ -5,6 +5,9 @@ SESSION_CONFIGS = [
     dict(
         name='phaser', app_sequence=['phaser'], num_demo_participants=2
     ),
+    dict(
+        name='simple_two_participants', app_sequence=['simple_two_participants'], num_demo_participants=2
+    )
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
