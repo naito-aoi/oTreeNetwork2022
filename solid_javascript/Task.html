@@ -56,11 +56,12 @@
 
     const COLORS = {
       armBase: '#609fa1',
-      armBack: '#b300ff',
+      armBack: '#ff4500',
       armChosen: '#e0ffff',
       armBaseHover: '#d3d3d3',
-      armDecide: '#ffffff',
-      armDecideText: '#ff4500'
+      armChosenHover: '#ffffff',
+      //armDecide: '#ffffff'
+      armDecide: '#ffc0cb'
     };
 
 
@@ -190,7 +191,6 @@
             ctx.globalAlpha = 0;
           }
           if(bricks[c+r*N_COL].status == 2) { // 選択されたときの表示
-            ctx.fillStyle = COLORS.armDecideText;
             ctx.globalAlpha = 1;
             rewardText = bricks[c+r*N_COL].reward;
           }
