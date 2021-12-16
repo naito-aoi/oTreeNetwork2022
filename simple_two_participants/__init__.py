@@ -90,11 +90,11 @@ class Task(Page):
     timer_text = '残り時間：'
 
     form_model = 'player'
-    form_fields = ['choice', 'reward']
+    form_fields = ['choice', 'reward', 'soc_info']
 
 
 class ResultsWaitPage(WaitPage):
-    player.soc_info = partner.in_round(player.round_number).choice
+    pass
 
 class Results(Page):
     pass

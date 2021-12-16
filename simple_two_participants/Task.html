@@ -18,8 +18,10 @@
   </div>
   <input type='hidden' name='choice' id='choice' />
   <input type='hidden' name='reward' id='reward' />
+  <input type='hidden' name='soc_info' id='soc_info' />
   {{ formfield_errors 'choice' }}
   {{ formfield_errors 'reward' }}
+  {{ formfield_errors 'soc_info' }}
 {{ endblock }}
 
 
@@ -57,7 +59,7 @@
     const COLORS = {
       armBase: '#609fa1',
       //armBack: '#b300ff',
-      armBack: '#ff4500', 
+      armBack: '#ff4500',
       armChosen: '#e0ffff',
       armBaseHover: '#d3d3d3',
       armDecide: '#ffffff',
@@ -253,6 +255,12 @@
               // データ保存
               document.getElementById('choice').value = c+r*N_COL;
               document.getElementById('reward').value = b.reward;
+              if(pastPartner != null) {
+                document.getElementById('soc_info').value = pastPartner;
+              } else {
+                document.getElementById('soc_info').value = -1;
+              }
+
 
               // 2秒のフィードバック
               setTimeout(function(){
