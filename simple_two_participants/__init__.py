@@ -39,6 +39,7 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     choice = models.IntegerField()
     reward = models.IntegerField()
+    soc_info = models.IntegerField()
 
 
 """
@@ -93,7 +94,7 @@ class Task(Page):
 
 
 class ResultsWaitPage(WaitPage):
-    pass
+    player.soc_info = partner.in_round(player.round_number).choice
 
 class Results(Page):
     pass
