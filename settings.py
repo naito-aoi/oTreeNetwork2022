@@ -41,7 +41,7 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'jikkenn'
 
 DEMO_PAGE_INTRO_HTML = """
-Phaser3 をつかって、多腕バンディット課題を作った.
+多腕バンディット課題（with 100 arms）.
 30試行でおわる.
 """
 
