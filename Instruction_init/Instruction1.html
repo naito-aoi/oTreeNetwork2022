@@ -1,0 +1,20 @@
+{{ block title }}
+    <p>実験の説明</p>
+{{ endblock }}
+
+{{ block content }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div style="background-color:#ffffff;; margin-bottom:20px;">
+        <p style="line-height:200%;">
+            　この実験では、「<b>2つのスロットマシンのどちらか1つ選んでプレイする</b>」という決定を繰り返し行っていただきます。
+            スロットマシンは、<b>色で区別</b>されています。
+        </p>
+        <p style="line-height:200%;">
+            　スロットマシンをプレイするたびに、「報酬ポイント」を獲得できます。
+            実験後に、実験参加への基本謝礼（1200円）に加えて、<b>「報酬ポイント」に応じた追加謝礼</b>をお支払いします。
+            より多くの報酬ポイントの獲得を目指しましょう！
+        <img src="{{ static 'slotmachine.png' }}"  style="display: block; margin: auto; margin-top:20px;"/>
+        </p>
+        <button class="otree-btn-next btn btn-primary" id="next-btn" style="float: right;">次のページへ</button>
+    </div>
+{{ endblock }}

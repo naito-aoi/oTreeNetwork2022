@@ -3,7 +3,40 @@ from os import environ
 
 SESSION_CONFIGS = [
     dict(
-        name='simple_two_participants', app_sequence=['simple_two_participants'], num_demo_participants=2
+        name='scd', # Solo -> Centralized -> Decentralized
+        app_sequence=['Instruction_init', 
+                      'Instruction_solo', 
+                      'solo', 
+                      'Instruction_cen', 
+                      'cen', 
+                      'Instruction_dec',
+                      'dec', 
+                      'Instruction_end'], 
+        num_demo_participants=3
+    ), 
+    dict(
+        name='cds', # Centralized -> Decentralized -> Solo
+        app_sequence=['Instruction_init', 
+                      'Instruction_cen', 
+                      'cen', 
+                      'Instruction_dec',
+                      'dec', 
+                      'Instruction_solo', 
+                      'solo', 
+                      'Instruction_end'], 
+        num_demo_participants=3
+    ), 
+    dict(
+        name='dsc', # Decentralized -> Solo -> Centralized
+        app_sequence=['Instruction_init', 
+                      'Instruction_dec',
+                      'dec', 
+                      'Instruction_solo', 
+                      'solo', 
+                      'Instruction_cen', 
+                      'cen', 
+                      'Instruction_end'], 
+        num_demo_participants=3
     )
 ]
 
@@ -13,7 +46,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, participation_fee=0.00, doc=""
+    real_world_currency_per_point=1.00, participation_fee=1200.00, doc=""
 )
 
 PARTICIPANT_FIELDS = ['progress', 'total_payoff']
@@ -24,7 +57,7 @@ SESSION_FIELDS = []
 LANGUAGE_CODE = 'ja'
 
 # e.g. EUR, GBP, CNY, JPY
-REAL_WORLD_CURRENCY_CODE = 'USD'
+REAL_WORLD_CURRENCY_CODE = 'JPY'
 USE_POINTS = True
 
 ROOMS = [
@@ -41,8 +74,7 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'jikkenn'
 
 DEMO_PAGE_INTRO_HTML = """
-多腕バンディット課題（with 100 arms）.
-30試行でおわる.
+多腕バンディット課題
 """
 
 AUTH_LEVEL = 'DEMO'

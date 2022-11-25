@@ -1,0 +1,351 @@
+{{ block title }}
+    <p>実験の説明</p>
+{{ endblock }}
+
+{{ block content }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div style="background-color:#ffffff;; margin-bottom:20px;">
+        <p style="line-height:200%;">
+            　この実験では、<b>イエローのスロットマシン</b>と<b>オレンジのスロットマシン</b>のどちらか1つ選んでプレイしていただきます。
+            あなたと同時に参加している他の参加者のうち、<b>直前のプレイ</b>でイエローとオレンジそれぞれのスロットマシンを選択した人数が表示されます。
+
+        </p>
+    </div>
+
+    <div style="background-color:#EDF7FF; padding:20px; margin-bottom:20px;">
+        <h5 style="text-align:center; margin-bottom:20px;">
+            <i class="fas fa-star"></i><b><u>スロットマシンの例</u></b><i class="fas fa-star"></i>
+        </h5>
+
+        <p style="line-height:200%;">
+            　イエロー・・オレンジのボックスが、それぞれのスロットマシンを表しています。
+            ボックスをクリックすると、スロットマシンをプレイすることができます。
+            それぞれのスロットマシンを選んだ<b>あなた以外の</b>参加者の人数が、黒色の数字で表示されます。
+            <b>下のどちらかのスロットマシンをクリックして、プレイしてみましょう！</b>
+        </p>
+
+        <div class="text-center" style="margin-bottom:20px;">
+            <div class="canvas-parent" style="margin:0 auto; margin-top:2rem;" id="canvasParent">
+            <canvas id='myCanvas' style="background: #ffffff"></canvas>
+            </div>
+        </div>
+
+        <p style="line-height:200%;">
+            <i class="fas fa-circle-exclamation" style="margin-right:8px; color:crimson"></i>
+            スロットマシンをプレイすると、次の説明に進めます。
+            <br>
+            <i class="fas fa-circle-exclamation" style="margin-right:8px; color:crimson"></i>
+            上図の数字は、説明のための例です。
+            <br>
+            <i class="fas fa-circle-exclamation" style="margin-right:8px; color:crimson"></i>
+            ボックスが表示されなかったり、クリック入力に反応しない場合は、実験者にzoomチャットでお知らせください。
+        </p>
+    </div>
+
+    <button class="otree-btn-next btn btn-primary" id="next-btn" style="float: right;">次のページへ</button>
+{{ endblock }}
+
+{{ block style }}
+  <style>
+    .canvas-parent {
+        width: 30vmin;
+        height: 30vmin;
+    }
+  </style>
+{{ endblock }}
+
+{{ block scripts }}
+  <script type="text/javascript">
+    'use strict';
+
+    document.getElementById('next-btn').style.visibility = 'hidden';
+
+    /*
+    ##############################
+     Constants
+    ##############################
+    */
+    const FRAMERATE = 60;
+    const FEEDBACK_TIME = 2000; // 報酬のフィードバック時間
+    
+    // アームの配列
+    const N_ROW = js_vars.arrange_arms[0];
+    const N_COL = js_vars.arrange_arms[1];
+
+    const COLORS = {
+      armBase: '#609fa1',
+      armLeft: '#ff9c66', // 橙
+      armRight: '#fff5bf', // 黄色
+      //armBack: '#b300ff',
+      armBack: '#ff4500',
+      armChosen: '#e0ffff',
+      armBaseHover: '#d3d3d3',
+      armDecide: '#ffffff',
+      armDecideText: '#ff4500', 
+      baseText: '#000000'
+    };
+
+
+    /*
+    ##############################
+     Variables
+    ##############################
+    */
+    // oTree: js_vars
+    let selected = false; // 選択したかどうか: Boolean をとる（初期化＝false）
+
+    // キャンバスのレスポンシブ対応
+    let canvasParent = document.getElementById("canvasParent");
+    let canvas = document.getElementById('myCanvas');
+    let ctx = canvas.getContext('2d');
+
+    let brickOffsetLeft = canvas.width/N_COL*0.1;
+    let brickOffsetTop = canvas.height/N_ROW*0.1;
+
+    let brickWidth = canvas.width/N_COL*0.8;
+    let brickHeight = canvas.height/N_ROW*0.8;
+    let brickPadding = 0;
+    let brickX;
+    let brickY;
+
+    let bricks; // アームのオブジェクト
+    let posIndex; // アームの位置（インデックスで呼び出し）
+
+    /*
+    // 社会情報の疑似生成
+    // 0からmax-1までの整数を返す
+    function getRandomInt(max) {
+        // ランダムな配列
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+    let socInfo = [];
+    let max = 4; 
+    let length = N_COL*N_ROW;
+    for (let i = 0; i < length; i++) {
+        socInfo.push(getRandomInt(max));
+    }
+    */
+    let socInfo = [1, 4];
+
+
+    /*
+    ##############################
+     Embedding information in bricks
+    ##############################
+    */
+    bricks = [];
+    for(let r=0; r<N_ROW; r++) {
+      for(let c=0; c<N_COL; c++) {
+        let brickIndex = c+r*N_COL;
+        bricks[brickIndex] = {x: 0, y: 0, colorBase: COLORS.armBase, status: 0};
+      }
+    }
+
+
+    /*
+    ##############################
+     Positioning bricks
+    ##############################   
+    */
+    // if randomize the positions...
+    const shuffle = ([...array]) => {
+      for (let i = array.length - 1; i >= 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+    posIndex = shuffle([...Array(N_ROW*N_COL)].map((_, i) => i));
+
+
+    /*
+    ##############################
+     Functions
+    ##############################
+    */
+    function definePositions() {
+      let positionX = Array(N_ROW*N_COL);
+      let positionY = Array(N_ROW*N_COL);
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL; c++) {
+          let brickIndex = c+r*N_COL;
+          let xRaw = canvas.width/N_COL * c; // (Right-side position of the brick)
+          let yRaw = canvas.height/N_ROW * r; // (Bottom-side position of the brick)
+          bricks[posIndex[brickIndex]].x = xRaw+brickOffsetLeft;
+          bricks[posIndex[brickIndex]].y = yRaw+brickOffsetTop;
+        }
+      }
+      if(N_ROW*N_COL == 2) {
+        bricks[0].colorBase = COLORS.armLeft;
+        bricks[1].colorBase = COLORS.armRight;
+      }
+    }
+
+    function drawBricks() {
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL; c++) {
+          let brickIndex = c+r*N_COL;
+          let xRaw = canvas.width/N_COL * c; // (Right-side position of the brick)
+          let yRaw = canvas.height/N_ROW * r; // (Bottom-side position of the brick)
+          brickX = xRaw+brickOffsetLeft; // x-coordinate of the brick (offset)
+          brickY = yRaw+brickOffsetTop; // y-coordinate of the brick (offset)
+
+          ctx.beginPath();
+          ctx.rect(bricks[brickIndex].x, bricks[brickIndex].y, brickWidth, brickHeight);
+
+          if(!selected) { // 未選択状態
+            if(bricks[brickIndex].status == 0) { // マウスが乗ってない
+              ctx.fillStyle = bricks[brickIndex].colorBase;
+            } else if (bricks[brickIndex].status == 1) { // マウスが乗ってる
+              ctx.fillStyle = COLORS.armBaseHover;
+            }
+          } else { // 選択済み状態
+            document.getElementById('next-btn').style.visibility = 'visible';
+            if(bricks[brickIndex].status == 2) { // 今回選ばれたbrickの色
+              ctx.fillStyle = COLORS.armDecide;
+            } else { // 今回選ばれなかったbrickの色
+              ctx.fillStyle = bricks[brickIndex].colorBase;
+            }
+          }
+
+          ctx.fill();
+          ctx.stroke();
+          ctx.closePath();
+        }
+      }
+    }
+
+    function drawSocial() { // 社会情報を表示
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL; c++) {
+          let brickIndex = c+r*N_COL;
+          let rewardText = socInfo[brickIndex];
+          
+          brickX = bricks[brickIndex].x;
+          brickY = bricks[brickIndex].y;
+
+          ctx.beginPath();
+          // reward
+          ctx.fillStyle = COLORS.baseText;
+          ctx.font = `${brickWidth*0.5}px Arial`;
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+
+          if(!selected) { // 未選択状態
+            ctx.globalAlpha = 1;
+          } else {
+            ctx.globalAlpha = 0;
+          }
+
+          ctx.fillText(`${rewardText}`, brickX+brickWidth/2, brickY+brickHeight/2, brickWidth);
+          ctx.fill();
+          ctx.closePath();
+        }
+      }
+    }
+
+    function drawRewards() {
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL; c++) {
+          let brickIndex = c+r*N_COL;
+          let rewardText = bricks[brickIndex].reward;
+          brickX = bricks[brickIndex].x;
+          brickY = bricks[brickIndex].y;
+
+          ctx.beginPath();
+          // reward
+          ctx.fillStyle = COLORS.baseText;
+          ctx.font = `${brickWidth*0.5}px Arial`;
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+          ctx.globalAlpha = 0;
+          if(bricks[brickIndex].status == 2) { // 選択されたときの表示
+            ctx.fillStyle = COLORS.armDecideText;
+            ctx.globalAlpha = 1;
+          }
+          ctx.fillText(`Good!`, brickX+brickWidth/2, brickY+brickHeight/2, brickWidth);
+          ctx.fill();
+          ctx.closePath();
+        }
+      }
+    }
+    
+    function draw() {
+      ctx.fillStyle = '#EDF7FF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      definePositions();
+      drawBricks();
+      drawSocial();
+      drawRewards();
+    }
+
+    function mouseMoveHandler(e) { // カーソルが乗ったときの反応
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL;c++) {
+          let brickIndex = c+r*N_COL;
+          let currentBrick = bricks[brickIndex];
+
+          let rect = canvas.getBoundingClientRect();
+          let mouseX = e.clientX - rect.left;
+          let mouseY = e.clientY - rect.top;
+
+          if(!selected) { // 未選択ならば
+            if(currentBrick.status == 0) { // まだ乗ってないならば
+              if(mouseX > currentBrick.x && mouseX < currentBrick.x+brickWidth && mouseY > currentBrick.y && mouseY<currentBrick.y+brickHeight) {
+                currentBrick.status = 1; // 乗ってる
+                document.getElementById('canvasParent').style.cursor = 'pointer';
+              }
+            } else { // すでに乗ってるならば
+              if(!(mouseX > currentBrick.x && mouseX < currentBrick.x+brickWidth && mouseY > currentBrick.y && mouseY<currentBrick.y+brickHeight)) {
+                currentBrick.status = 0; // 乗ってない
+                document.getElementById('canvasParent').style.cursor = 'auto';
+              }
+            }
+          } else { // 選択済みならば
+            document.getElementById('canvasParent').style.cursor = 'auto';
+          }
+        }
+      }
+    }
+
+    function onMouseDown(e) { // クリック時の反応
+      for(let r=0; r<N_ROW; r++) {
+        for(let c=0; c<N_COL;c++) {
+          let brickIndex = c+r*N_COL;
+          let currentBrick = bricks[brickIndex];
+
+          let rect = canvas.getBoundingClientRect();
+          let mouseX = e.clientX - rect.left;
+          let mouseY = e.clientY - rect.top;
+
+          if(currentBrick.status == 1){ // すでに乗ってるならば
+            if(mouseX > currentBrick.x && mouseX < currentBrick.x+brickWidth && mouseY > currentBrick.y && mouseY<currentBrick.y+brickHeight) {
+              currentBrick.status = 2; // 選択終了
+              selected = true;
+            }
+          }
+        }
+      }
+    }
+
+    // レスポンシブ対応
+    function resize() {
+      canvas.width = canvasParent.clientWidth;
+      canvas.height = canvasParent.clientHeight;
+      brickWidth = canvas.width/N_COL*0.8;
+      brickHeight = canvas.height/N_ROW*0.8;
+      draw();
+    }
+
+    /*
+    ##############################
+     Interval
+    ##############################
+    */
+    document.addEventListener('mousemove', mouseMoveHandler, false);
+    document.addEventListener('mousedown', onMouseDown, false);
+
+    let interval = setInterval(resize, 1000/FRAMERATE);
+
+  </script>
+{{ endblock }}

@@ -1,0 +1,30 @@
+<script>
+window.Papercups = {
+  config: {
+    accountId: "5ee2437e-b9e9-4348-8e1c-483959b1d826",
+    title: "Welcome to our experiment",
+    subtitle: "Ask us anything in the chat window below",
+    primaryColor: "#1890ff",
+    greeting: "",
+    awayMessage: "",
+    newMessagePlaceholder: "Start typing...",
+    showAgentAvailability: false,
+    agentAvailableText: "We're online right now!",
+    agentUnavailableText: "We're away at the moment.",
+    requireEmailUpfront: false,
+    iconVariant: "outlined",
+    // note: you need to set up your own Papercups chat server (quite easy).
+    baseUrl: "https://otree-papercups.herokuapp.com",
+    customer: {
+      name: '{{participant.code}}',
+      external_id: '{{participant.code}}',
+    }
+  },
+};
+</script>
+<script
+type="text/javascript"
+async
+defer
+src="https://otree-papercups.herokuapp.com/widget.js"
+></script>

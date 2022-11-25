@@ -1,0 +1,23 @@
+{{ block title }}
+    <p>実験の説明</p>
+{{ endblock }}
+
+{{ block content }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div style="background-color:#ffffff;; margin-bottom:20px;">
+        <p style="line-height:200%;">
+            　スロットマシンごとに、<b>得られる報酬ポイントの期待値は異なります</b>。
+            どちらか一方のスロットマシンが、平均的には高い報酬ポイントを得られるということです。
+            ただし、2つのスロットマシンのうち、どちらの方が高いポイントを得られるのかは明らかにされません。
+        <img src="{{ static 'winloss.png' }}"  style="display: block; margin: auto; margin-top:20px; margin-bottom:20px;"/>
+        </p>
+        <p style="line-height:200%;">
+            　また、スロットマシンをプレイして得られる報酬ポイントには、ばらつきがあります。
+            したがって、同じスロットマシンを選んだとしても、<b>毎回同じ報酬ポイントが得られるとは限りません</b>。
+        </p>
+        <p style="line-height:200%;">
+            　なお、スロットマシンの選択の制限時間は各回<b>10秒</b>です。制限時間を超えると、その回の報酬ポイントは0となり、自動的に次の回に進みます。
+        </p>
+        <button class="otree-btn-next btn btn-primary" id="next-btn" style="float: right;">次のページへ</button>
+    </div>
+{{ endblock }}
